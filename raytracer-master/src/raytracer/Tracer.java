@@ -11,8 +11,6 @@ public class Tracer
 
    public static final double TOLERANCE = 0.000001;
 
-   private static final int MAX_RECURSION = 4;
-
    private static final double REFLECTIVITY = 0.10;
 
    private final ExecutorService executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
@@ -34,7 +32,7 @@ public class Tracer
 
    public void render(Camera camera, Scene scene)
    {
-      int xStart = width >> 1;
+      int xStart = width >> 1; // divide por dois 
       int yStart = height >> 1;
 
       todo.clear();
@@ -48,7 +46,7 @@ public class Tracer
             for (int wx = -xStart; wx < xStart; wx++)
             {
                camera.transform(ray.direction.set(wx, yStart - finalY, camera.fov)).normalize();
-               pixels[offset++] = traceRay(scene, ray, 0);
+               pixels[offset++] = traceRay(scene, ray, 0, wx, yStart - finalY);
             }
          }));
       }
@@ -63,7 +61,7 @@ public class Tracer
       }
    }
 
-   private int traceRay(Scene scene, Ray ray, int level)
+   private int traceRay(Scene scene, Ray ray, int level, int wx, int y)
    {
       Ray hitRay = new Ray();
       Geometry intersected = scene.intersect(ray, hitRay);
@@ -104,15 +102,6 @@ public class Tracer
                   }
                }
             }
-         }
-
-         if (level <= MAX_RECURSION)
-         {
-            Ray result = new Ray();
-            result.direction.set(hitRay.direction).mul(-2.0 * ray.direction.dot(hitRay.direction)).add(ray.direction);
-            result.origin.set(result.direction).mul(TOLERANCE).add(hitRay.origin);
-            Color color = new Color(traceRay(scene, result, level + 1));
-            kr.add(REFLECTIVITY * color.red, REFLECTIVITY * color.grn, REFLECTIVITY * color.blu);
          }
 
          return shade(scene.ambient.red * material.ambient.red + kd.x + ks.x + kr.x, 0x10)

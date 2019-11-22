@@ -129,22 +129,6 @@ public class Scene
       return new Color(color >> 1 & 0x7f7f7f);
    }
 
-   private class CheckeredMaterial extends Material
-   {
-      public final Color diffuseColorAlt;
-
-      public CheckeredMaterial(Color ambientColor, Color diffuseColor1, Color diffuseColor2, Color specularColor)
-      {
-         super(ambientColor, diffuseColor1, specularColor);
-         diffuseColorAlt = diffuseColor2;
-      }
-
-      public Color computeDiffuse(Ray r)
-      {
-         return (Math.floor(r.origin.z * 0.025) + Math.floor(r.origin.x * 0.025)) % 2 != 0 ? diffuse : diffuseColorAlt;
-      }
-   }
-   
    private class BlackRubber extends Material
    {
       public final Color diffuseColorBr;
